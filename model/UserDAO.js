@@ -33,7 +33,7 @@ export default class UserDAO {
     try {
       const session = await sessions.updateOne(
         {
-          user_id: email,
+          email,
         },
         {
           $set: {
@@ -44,6 +44,15 @@ export default class UserDAO {
           upsert: true,
         }
       )
+      return { success: true }
+    } catch (e) {
+      return { error: e }
+    }
+  }
+
+  static async logout(email) {
+    try {
+      await sessions.deleteOne({ email })
       return { success: true }
     } catch (e) {
       return { error: e }

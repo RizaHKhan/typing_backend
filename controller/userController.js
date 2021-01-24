@@ -160,4 +160,27 @@ export default class UserController {
       res.sendStatus(400).json({ error: e })
     }
   }
+
+  static async logout(req, res) {
+    try {
+      const userJwt = req.get("Authorization").slice("Bearer ".length)
+      const userObj = await User.decoded(userJwt)
+      var { error } = userObj
+      if (error) {
+        res.sendStatus(401).json({ error })
+        return
+      }
+
+      const logoutResult = UserDAO.logout(userObj.email)
+      var { error } = logoutResult
+      if (error) {
+        res.status(500).json({ error: "Server Error" })
+        return
+      }
+
+      res.json(logoutResult)
+    } catch (e) {
+      res.sendStatus(400).json({ error: e })
+    }
+  }
 }

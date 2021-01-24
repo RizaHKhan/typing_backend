@@ -7,5 +7,6 @@ router
   .post(userController.login)
   .get(userController.loginUserInfo)
 router.route("/register").post(userController.register)
+router.route("/logout").post(userController.logout)
 
 export default router
