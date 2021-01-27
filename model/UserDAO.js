@@ -1,4 +1,3 @@
-// data access object
 let users
 let sessions
 
@@ -31,7 +30,7 @@ export default class UserDAO {
 
   static async loginUser(email, jwt) {
     try {
-      const session = await sessions.updateOne(
+      await sessions.updateOne(
         {
           email,
         },
