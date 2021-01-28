@@ -5,14 +5,15 @@ import UserDAO from "../model/UserDAO.js"
 const hashPassword = async (password) => await bcrypt.hash(password, 10)
 
 export class User {
-  constructor({ _id, email, password = {} } = {}) {
+  constructor({ _id, email, password, admin = {} } = {}) {
     this._id = _id
     this.email = email
     this.password = password
+    this.admin = admin || false
   }
 
   toJson() {
-    return { _id: this._id, email: this.email }
+    return { _id: this._id, email: this.email, admin: this.admin }
   }
 
   async comparePassword(plainText) {
@@ -181,6 +182,28 @@ export default class UserController {
       res.json(logoutResult)
     } catch (e) {
       res.sendStatus(400).json({ error: e })
+    }
+  }
+
+  static async verifyAdmin(req, res, next) {
+    try {
+      const userJwt = req.get("Authorization").slice("Bearer ".length)
+      const userObj = await User.decoded(userJwt)
+
+      var { error } = userObj
+      if (error) {
+        res.sendStatus(401).json({ error })
+        return
+      }
+
+      if (!userObj.admin) {
+        res.sendStatus(400).json({ error: "Unauthorized" })
+        return
+      }
+
+      next()
+    } catch (e) {
+      res.send(400).json({ error: e })
     }
   }
 }
