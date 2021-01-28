@@ -1,7 +1,7 @@
-import TestsDAO from "../model/TestsDAO.js"
+import BlogDAO from "../model/BlogDAO.js"
 import { User } from "./userController.js"
 
-export default class TestsController {
+export default class BlogsController {
   static async addTest(req, res) {
     try {
       const { email, wrongWords, correctWords, score } = req.body

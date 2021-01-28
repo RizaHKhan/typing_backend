@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser"
 import cors from "cors"
 import users from "./routes/users.js"
 import tests from "./routes/tests.js"
+import blogs from "./routes/blogs.js"
 
 dotenv.config()
 const app = express()
@@ -19,5 +20,6 @@ app.use(bodyParser.urlencoded({ extended: true }))
 // registering routes
 app.use("/api/v1/users", users)
 app.use("/api/v1/tests", tests)
+app.use("/api/v1/blogs", blogs)
 //
 export default app

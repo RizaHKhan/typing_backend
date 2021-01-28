@@ -13,7 +13,7 @@ export default class TestsDAO {
     }
   }
 
-  static async addTest(email, correctWords, wrongWords, score) {
+  static async addTest(email, wrongWords, score) {
     try {
       await tests.updateOne(
         {
@@ -21,7 +21,6 @@ export default class TestsDAO {
         },
         {
           $push: {
-            correctWords,
             wrongWords,
             score,
           },
@@ -47,8 +46,8 @@ export default class TestsDAO {
           },
           {
             $project: {
-              wrongWords: 1,
               _id: 0,
+              wrongWords: 1,
               numOfTests: {
                 $size: "$score",
               },
@@ -60,7 +59,35 @@ export default class TestsDAO {
         ])
         .toArray()
 
-      return { metaData: metaData[0] }
+      const globalAvg = await tests
+        .aggregate([
+          {
+            $project: {
+              _id: 0,
+              score: 1,
+            },
+          },
+          {
+            $unwind: "$score",
+          },
+          {
+            $group: {
+              _id: null,
+              average: {
+                $avg: "$score",
+              },
+            },
+          },
+          {
+            $project: {
+              _id: 0,
+              average: 1,
+            },
+          },
+        ])
+        .toArray()
+
+      return { metaData: metaData[0], globalAvg: globalAvg[0] }
     } catch (e) {
       return { error: e }
     }
