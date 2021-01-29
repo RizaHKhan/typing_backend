@@ -4,10 +4,10 @@ import { User } from "./userController.js"
 export default class TestsController {
   static async addTest(req, res) {
     try {
-      const { email, wrongWords, correctWords, score } = req.body
+      const { email, wrongWords, score } = req.body
       const response = await TestsDAO.addTest(email, wrongWords, score)
       if (!response.success) {
-        res.send(401).json({ error: "Server Error" })
+        res.sendStatus(401).json({ error: "Server Error" })
       }
       res.sendStatus(200)
     } catch (e) {
@@ -22,7 +22,7 @@ export default class TestsController {
       const metaData = await TestsDAO.getMetaData(email)
       res.send(metaData)
     } catch (e) {
-      res.send(400)
+      res.sendStatus(400)
     }
   }
 }
