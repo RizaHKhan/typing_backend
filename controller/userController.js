@@ -86,7 +86,7 @@ export default class UserController {
       }
 
       if (errors.length > 0) {
-        res.sendStatus(400).json(errors)
+        res.status(400).json(errors)
         return
       }
 
@@ -98,7 +98,7 @@ export default class UserController {
         user: user.toJson(),
       })
     } catch (e) {
-      res.sendStatus(500).json({ error: e })
+      res.status(500).json({ error: e })
     }
   }
 
@@ -107,35 +107,26 @@ export default class UserController {
       const { email, password } = req.body
 
       if (!email || typeof email !== "string") {
-        res.sendStatus(400).json({ error: "Bad email format, expected string" })
-        return
+        throw new Error("Bad Email Format, Expected String")
       }
 
       if (!password || typeof password !== "string") {
-        res
-          .sendStatus(400)
-          .json({ error: "Bad password format, expected string" })
-        return
+        throw new Error("Bad Password Format, Expected String")
       }
 
       const userData = await UserDAO.getUser(email)
-
       if (!userData) {
-        res.sendStatus(401).json({ error: "Ensure your email is correct" })
-        return
+        throw new Error("Incorrect Email Type")
       }
 
       const user = new User(userData)
-
       if (!(await user.comparePassword(password))) {
-        res.sendStatus(401).json({ error: "Incorrect password" })
-        return
+        throw new Error("Wrong Password")
       }
 
       const loginResponse = await UserDAO.loginUser(user.email, user.encoded())
       if (!loginResponse.success) {
-        res.sendStatus(500).json({ error: "Server Error" })
-        return
+        throw new Error("Server Issues While Logging In")
       }
 
       res.json({
@@ -143,7 +134,7 @@ export default class UserController {
         user: user.toJson(),
       })
     } catch (e) {
-      res.sendStatus(400).json({ error: e })
+      return res.status(400).json({ error: e })
     }
   }
 
@@ -153,12 +144,12 @@ export default class UserController {
       const userObj = await User.decoded(userJwt)
       let { error } = userObj
       if (error) {
-        res.sendStatus(401).json({ error })
+        res.status(401).json({ error })
         return
       }
       res.send({ user: userObj })
     } catch (e) {
-      res.sendStatus(400).json({ error: e })
+      return res.status(400).json({ error: e })
     }
   }
 
@@ -168,7 +159,7 @@ export default class UserController {
       const userObj = await User.decoded(userJwt)
       var { error } = userObj
       if (error) {
-        res.sendStatus(401).json({ error })
+        res.status(401).json({ error })
         return
       }
 
@@ -181,7 +172,7 @@ export default class UserController {
 
       res.json(logoutResult)
     } catch (e) {
-      res.sendStatus(400).json({ error: e })
+      res.status(400).json({ error: e })
     }
   }
 
@@ -192,12 +183,12 @@ export default class UserController {
 
       var { error } = userObj
       if (error) {
-        res.sendStatus(401).json({ error })
+        res.status(401).json({ error })
         return
       }
 
       if (!userObj.admin) {
-        res.sendStatus(400).json({ error: "Unauthorized" })
+        res.status(400).json({ error: "Unauthorized" })
         return
       }
 
